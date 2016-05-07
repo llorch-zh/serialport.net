@@ -37,7 +37,7 @@ namespace mywork_chuan
         Bitmap cache = null;
 
 
-        Color[] _data;
+        byte[] _data;
         int _currentIndex;
 
 
@@ -64,7 +64,7 @@ namespace mywork_chuan
             comboBox2.Items.Add("115200");
             label4.Text = num.ToString();
             cache = new Bitmap(320, 240, PixelFormat.Format24bppRgb);
-           this._data=new Color[320*240];
+           this._data=new byte[2*320*240];
            this._currentIndex = 0;
         }
 
@@ -98,7 +98,7 @@ namespace mywork_chuan
                     button4.Text = "打开串口";
                     comboBox1.Enabled = true;
                     comboBox2.Enabled = true;
-                    MessageBox.Show("打开串口失败，请重试！", "错误提示");
+                    //MessageBox.Show("打开串口失败，请重试！", "错误提示");
                 }
             }
             else
@@ -149,43 +149,59 @@ namespace mywork_chuan
             //System.Threading.Thread.Sleep(1000);//延时10ms等待接收完数据,根据实际情况定
                                               //代理，对数据进行处理
 
+            string buff = this.sp.ReadExisting();
+            for (int i = 0; i < buff.Length; i++)
+            {
+                // position
+                int x = this._currentIndex % 320;
+                int y = this._currentIndex / 320;
 
 
-            int SDateTemp = this.sp.ReadByte();
-            //读取串口中一个字节的数据  
-            this.richTextBox1.Invoke(
-                //在拥有此控件的基础窗口句柄的线程上执行委托Invoke(Delegate)  
-                //即在textBox_ReceiveDate控件的父窗口form中执行委托.  
-             new MethodInvoker(
-                /*表示一个委托，该委托可执行托管代码中声明为 void 且不接受任何参数的任何方法。 在对控件的 Invoke    方法进行调用时或需要一个简单委托又不想自己定义时可以使用该委托。*/
-             delegate
-             {
-                 /*匿名方法,<a href="http://lib.csdn.net/base/25" class='replace_word' title="C#知识库" target='_blank' style='color:#df3434; font-weight:bold;'>C#</a>2.0的新功能，这是一种允许程序员将一段完整代码区块当成参数传递的程序代码编写技术，通过此种方法可    以直接使用委托来设计事件响应程序以下就是你要在主线程上实现的功能但是有一点要注意，这里不适宜处理过多的方法，因为C#消息机制是消息流水线响应机制，如果这里在主线程上处理语句的时间过长会导致主UI线程阻塞，停止响应或响应不顺畅,这时你的主form界面会延迟或卡死      */
-                 this.richTextBox1.AppendText(SDateTemp.ToString());//输出到主窗口文本控件  
-                 this.richTextBox1.Text += " ";
-
-                 // position
-                 int x = this._currentIndex % 320;
-                 int y = this._currentIndex / 320;
-
-                 // data to color
-                 Color c = Color.FromArgb(SDateTemp,255,0);
-
-                 //loop flag
-                 this._currentIndex = (this._currentIndex + 1) % (320 * 240);
 
 
-                 _graphics = this.CreateGraphics();
-                 PointBitmap pb = new PointBitmap(cache);
-                 pb.LockBits();
-                 pb.SetPixel(x,y,c);
-                 pb.UnlockBits();
-                 _graphics.DrawImage(cache,10,200);
+                Color c = Color.FromArgb(255, 255, 0);
+
+                //loop flag
+                this._currentIndex = (this._currentIndex + 1) % (320 * 240);
 
 
-             }
-             )
-             );
+                // update ui
+                //读取串口中一个字节的数据  
+                this.richTextBox1.Invoke(
+                    //在拥有此控件的基础窗口句柄的线程上执行委托Invoke(Delegate)  
+                    //即在textBox_ReceiveDate控件的父窗口form中执行委托.  
+                 new MethodInvoker(
+                    /*表示一个委托，该委托可执行托管代码中声明为 void 且不接受任何参数的任何方法。 在对控件的 Invoke    方法进行调用时或需要一个简单委托又不想自己定义时可以使用该委托。*/
+                 delegate
+                 {
+
+
+
+                     /*匿名方法,<a href="http://lib.csdn.net/base/25" class='replace_word' title="C#知识库" target='_blank' style='color:#df3434; font-weight:bold;'>C#</a>2.0的新功能，这是一种允许程序员将一段完整代码区块当成参数传递的程序代码编写技术，通过此种方法可    以直接使用委托来设计事件响应程序以下就是你要在主线程上实现的功能但是有一点要注意，这里不适宜处理过多的方法，因为C#消息机制是消息流水线响应机制，如果这里在主线程上处理语句的时间过长会导致主UI线程阻塞，停止响应或响应不顺畅,这时你的主form界面会延迟或卡死      */
+                     this.richTextBox1.AppendText(buff[i].ToString());//输出到主窗口文本控件  
+                     this.richTextBox1.Text += " ";
+
+
+
+                     using (_graphics = this.CreateGraphics())
+                     {
+                         PointBitmap pb = new PointBitmap(cache);
+
+                         pb.LockBits();
+                         pb.SetPixel(x, y, c);
+                         pb.UnlockBits();
+                         _graphics.DrawImage(cache, 10, 200);
+
+                     }
+
+
+                 }
+                 )
+                 );
+
+            }
+
+            
 
 
             return;
