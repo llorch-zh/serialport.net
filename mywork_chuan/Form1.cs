@@ -148,11 +148,15 @@ namespace mywork_chuan
             {
                 this.Invoke((EventHandler)delegate
                 {
-                    while (Global.CurrentIndex >= Global.DATA.Length)
-                        Global.CurrentIndex -= Global.DATA.Length;
-                    Global.DATA[Global.CurrentIndex] = (byte)sp.ReadByte();
-                    //this.richTextBox1.Text += Global.DATA[Global.CurrentIndex]+ " ";
-                    Global.CurrentIndex++;
+                    
+
+                    string total = sp.ReadExisting();
+                    for (int i = 0; i < total.Length; i++)
+                    {
+                        Global.DATA[Global.CurrentIndex] = (byte)total[i];
+                        //this.richTextBox1.Text += Global.DATA[Global.CurrentIndex]+ " ";
+                        Global.CurrentIndex=(Global.CurrentIndex+1) % Global.DATA.Length;
+                    }
 
                 });
             }
@@ -229,12 +233,12 @@ namespace mywork_chuan
                         int y = i / 640;
 
                         int red = Global.DATA[i] * 4 > 255 ? Global.DATA[i] : 255;
-                        int green = Global.DATA[i+1] * 4 > 255 ? Global.DATA[i+1] : 255;
+                        int green = Global.DATA[i + 1] * 4 > 255 ? Global.DATA[i + 1] : 255;
                         int blue = red / 3 + green * 2 / 3;
                         //int red = (Global.DATA[i] & 0xF8) >> 3;
                         //int green = ((Global.DATA[i] & 0x07) << 3) | ((Global.DATA[i + 1] & 0xE0) >> 5);
                         //int blue = Global.DATA[i + 1] & 0x1F;
-                        Color c = Color.FromArgb(red,green,blue);
+                        Color c = Color.FromArgb(red, green, blue);
                         pb.SetPixel(x, y, c);
                         //this.richTextBox1.Text += Global.DATA[i] + "-" + Global.DATA[i + 1] + "";
                     }
