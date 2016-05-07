@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -39,6 +40,7 @@
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.button5 = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
+            this.timerDrawImage = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // label1
@@ -140,6 +142,12 @@
             this.label4.Size = new System.Drawing.Size(0, 12);
             this.label4.TabIndex = 13;
             // 
+            // timerDrawImage
+            // 
+            this.timerDrawImage.Enabled = true;
+            this.timerDrawImage.Interval = 2000;
+            this.timerDrawImage.Tick += new System.EventHandler(this.timerDrawImage_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -179,6 +187,7 @@
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Timer timerDrawImage;
     }
 }
 

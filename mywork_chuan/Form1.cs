@@ -24,7 +24,7 @@ namespace mywork_chuan
         SerialPort sp = null;//声明一个串口类
         bool isOpen = false;//打开串口标志位
         bool isSetProperty = false;//属性设置标志位
-                                   // bool isHEX = false;//16进制显示标志位
+        // bool isHEX = false;//16进制显示标志位
         Graphics _graphics = null;
         StreamWriter s = null;
         float last = 290;//数据显示时使用，用于记录上一个数据，初始值为基线
@@ -64,8 +64,9 @@ namespace mywork_chuan
             comboBox2.Items.Add("115200");
             label4.Text = num.ToString();
             cache = new Bitmap(320, 240, PixelFormat.Format24bppRgb);
-           this._data=new byte[2*320*240];
-           this._currentIndex = 0;
+            this._data = new byte[2 * 320 * 240];
+            this._currentIndex = 0;
+            this.timerDrawImage.Enabled = false;
         }
 
         /*
@@ -90,6 +91,7 @@ namespace mywork_chuan
                     isSetProperty = true;
                     this.richTextBox1.Text = "";
                     s = new StreamWriter("数据.txt");
+                    this.timerDrawImage.Enabled = true;
                 }
                 catch
                 {
@@ -113,6 +115,7 @@ namespace mywork_chuan
                     comboBox1.Enabled = true;
                     comboBox2.Enabled = true;
                     s.Close();
+                    this.timerDrawImage.Enabled = false;
                 }
                 catch
                 {
@@ -146,106 +149,15 @@ namespace mywork_chuan
          */
         private void sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            //System.Threading.Thread.Sleep(1000);//延时10ms等待接收完数据,根据实际情况定
-                                              //代理，对数据进行处理
-
-            string buff = this.sp.ReadExisting();
-            for (int i = 0; i < buff.Length; i++)
+            this.Invoke((EventHandler)delegate
             {
-                // position
-                int x = this._currentIndex % 320;
-                int y = this._currentIndex / 320;
-
-
-
-
-                Color c = Color.FromArgb(255, 255, 0);
-
-                //loop flag
-                this._currentIndex = (this._currentIndex + 1) % (320 * 240);
-
-
-                // update ui
-                //读取串口中一个字节的数据  
-                this.richTextBox1.Invoke(
-                    //在拥有此控件的基础窗口句柄的线程上执行委托Invoke(Delegate)  
-                    //即在textBox_ReceiveDate控件的父窗口form中执行委托.  
-                 new MethodInvoker(
-                    /*表示一个委托，该委托可执行托管代码中声明为 void 且不接受任何参数的任何方法。 在对控件的 Invoke    方法进行调用时或需要一个简单委托又不想自己定义时可以使用该委托。*/
-                 delegate
-                 {
-
-
-
-                     /*匿名方法,<a href="http://lib.csdn.net/base/25" class='replace_word' title="C#知识库" target='_blank' style='color:#df3434; font-weight:bold;'>C#</a>2.0的新功能，这是一种允许程序员将一段完整代码区块当成参数传递的程序代码编写技术，通过此种方法可    以直接使用委托来设计事件响应程序以下就是你要在主线程上实现的功能但是有一点要注意，这里不适宜处理过多的方法，因为C#消息机制是消息流水线响应机制，如果这里在主线程上处理语句的时间过长会导致主UI线程阻塞，停止响应或响应不顺畅,这时你的主form界面会延迟或卡死      */
-                     this.richTextBox1.AppendText(buff[i].ToString());//输出到主窗口文本控件  
-                     this.richTextBox1.Text += " ";
-
-
-
-                     using (_graphics = this.CreateGraphics())
-                     {
-                         PointBitmap pb = new PointBitmap(cache);
-
-                         pb.LockBits();
-                         pb.SetPixel(x, y, c);
-                         pb.UnlockBits();
-                         _graphics.DrawImage(cache, 10, 200);
-
-                     }
-
-
-                 }
-                 )
-                 );
-
-            }
-
-            
-
-
-            return;
-
-
-            this.Invoke((EventHandler)(delegate
-            {
-                int tmp = sp.BytesToRead;//读取总共有多少数据
-                _graphics = this.CreateGraphics();
-                PointBitmap pb = new PointBitmap(cache);
-                pb.LockBits();
-                for (int w = 0; w < 320; w++)
-                {
-                    for (int h = 0; h < 240; h++)
-                    {
-                        Color c = Color.White; ;
-                        if (tmp > h * 320 + w) 
-                        {
-                            c = Color.Black;
-                            
-                        }
-                        else
-                        {
-                            int r = Convert.ToInt32(255);//逐字节读取
-                            int g = Convert.ToInt32(0);//换算Y值，当前画图区在200-380之间，共180像素
-                            int b = Convert.ToInt32(0);//逐字节读取
-                            c = Color.FromArgb(r, g, b);
-                        }
-                        pb.SetPixel(w, h, c);
-                    }
-                }
-                pb.UnlockBits();
-                _graphics.DrawImage(cache, 10, 200);
-
-
-
-                
-                //s.Close();
-            }));
-
-            //sp.DiscardInBuffer();
-
-
+                this._data[_currentIndex] = (byte)sp.ReadByte();
+                //this.richTextBox1.Text += this._data[_currentIndex]+ " ";
+                this._currentIndex = (_currentIndex + 1) % _data.Length;
+            });
         }
+
+
 
         private void button1_Click(object sender, EventArgs e)//清除接收按钮
         {
@@ -292,6 +204,35 @@ namespace mywork_chuan
             last = 290;
             last_h = 490;
 
+        }
+
+        private void timerDrawImage_Tick(object sender, EventArgs e)
+        {
+            this.Invoke((EventHandler)(delegate
+            {
+                using (_graphics = this.CreateGraphics())
+                {
+                    this.richTextBox1.Text = "";
+                    PointBitmap pb = new PointBitmap(cache);
+
+                    pb.LockBits();
+                    for (int i = 0; i < this._data.Length; i += 2)
+                    {
+                        int x = (i % 640) / 2;
+                        int y = i / 640;
+                        int red = (this._data[i] & 0xF8) >> 3;
+                        int green = ((this._data[i] & 0x07) << 3) | ((this._data[i+1] & 0xE0) >> 5);
+                        int blue = this._data[i+1] & 0x1F;
+                        Color c = Color.FromArgb(red,green,blue);
+                        pb.SetPixel(x, y, c);
+                        this.richTextBox1.Text += this._data[i] + "-" + this._data[i + 1] + "";
+                    }
+                    pb.UnlockBits();
+                    _graphics.DrawImage(cache, 10, 200);
+
+                }
+
+            }));
         }
 
 
