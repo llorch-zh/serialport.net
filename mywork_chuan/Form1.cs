@@ -144,22 +144,18 @@ namespace mywork_chuan
          */
         private void sp_dataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            if (this != null)
+            int count = sp.BytesToRead;
+            if (count + Global.CurrentIndex >= Global.DATA.Length)
             {
-                this.Invoke((EventHandler)delegate
-                {
-                    
-
-                    string total = sp.ReadExisting();
-                    for (int i = 0; i < total.Length; i++)
-                    {
-                        Global.DATA[Global.CurrentIndex] = (byte)total[i];
-                        //this.richTextBox1.Text += Global.DATA[Global.CurrentIndex]+ " ";
-                        Global.CurrentIndex=(Global.CurrentIndex+1) % Global.DATA.Length;
-                    }
-
-                });
+                sp.Read(Global.DATA,Global.CurrentIndex,Global.DATA.Length-Global.CurrentIndex-1);
+                sp.Read(Global.DATA,0,count+Global.CurrentIndex-Global.DATA.Length+1);
             }
+            else
+            {
+                sp.Read(Global.DATA, Global.CurrentIndex, sp.BytesToRead);
+               
+            }
+            Global.CurrentIndex = (Global.CurrentIndex + count) % Global.DATA.Length;
         }
 
 
