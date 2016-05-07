@@ -88,6 +88,9 @@ namespace mywork_chuan
                 {
                     isSetProperty = false;
                     isOpen = false;
+                    button4.Text = "打开串口";
+                    comboBox1.Enabled = true;
+                    comboBox2.Enabled = true;
                     MessageBox.Show("打开串口失败，请重试！", "错误提示");
                 }
             }
@@ -106,6 +109,9 @@ namespace mywork_chuan
                 }
                 catch
                 {
+                    button4.Text = "关闭串口";
+                    comboBox1.Enabled = false;
+                    comboBox2.Enabled = false;
                     MessageBox.Show("关闭串口失败，请重试！", "错误提示");
                 }
             }
