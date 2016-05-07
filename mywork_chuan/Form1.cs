@@ -25,7 +25,7 @@ namespace mywork_chuan
         bool isOpen = false;//打开串口标志位
         bool isSetProperty = false;//属性设置标志位
                                    // bool isHEX = false;//16进制显示标志位
-        Graphics g = null;
+        Graphics _graphics = null;
         StreamWriter s = null;
         float last = 290;//数据显示时使用，用于记录上一个数据，初始值为基线
         float last_h = 490;//数据显示时使用，用于记录上一个数据，初始值为基线，心电
@@ -139,8 +139,7 @@ namespace mywork_chuan
             this.Invoke((EventHandler)(delegate
             {
                 int tmp = sp.BytesToRead;//读取总共有多少数据
-                g = this.CreateGraphics();
-                g = this.CreateGraphics();
+                _graphics = this.CreateGraphics();
                 PointBitmap pb = new PointBitmap(cache);
                 pb.LockBits();
                 for (int w = 0; w < 320; w++)
@@ -155,7 +154,7 @@ namespace mywork_chuan
                     }
                 }
                 pb.UnlockBits();
-                g.DrawImage(cache, 10, 200);
+                _graphics.DrawImage(cache, 10, 200);
 
 
                 //s.Close();
@@ -175,21 +174,21 @@ namespace mywork_chuan
 
         private void Form1_Paint(object sender, PaintEventArgs e)//测试画图，画线，区分画图区
         {
-            g = e.Graphics;
+            _graphics = e.Graphics;
             Pen pn = new Pen(Color.Black);
             Point pt1 = new Point(0, 200);
             Point pt2 = new Point(480, 200);
-            g.DrawLine(pn, pt1, pt2);
+            _graphics.DrawLine(pn, pt1, pt2);
         }
 
         private void button3_Click(object sender, EventArgs e)//清除画图按钮，清除FORM画图，同时重新画线，last和j置初始值
         {
-            g = this.CreateGraphics();
-            g.Clear(Color.White);
+            _graphics = this.CreateGraphics();
+            _graphics.Clear(Color.White);
             Pen pn = new Pen(Color.Black);
             Point pt1 = new Point(0, 300);
             Point pt2 = new Point(480, 300);
-            g.DrawLine(pn, pt1, pt2);
+            _graphics.DrawLine(pn, pt1, pt2);
             last = 390;
             j = 30;
             num = 0;
@@ -200,8 +199,8 @@ namespace mywork_chuan
             s.Close();
             s = new StreamWriter("C:\\Users\\Administrator\\Desktop\\拷贝\\程序\\c#\\自编串口助手\\mywork_chuan\\数据" + count_txt.ToString() + ".txt");
             count_txt++;
-            g = this.CreateGraphics();
-            g.Clear(Color.White);
+            _graphics = this.CreateGraphics();
+            _graphics.Clear(Color.White);
             num = 0;
             label4.Text = num.ToString();
             count = 1;
