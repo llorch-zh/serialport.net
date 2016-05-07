@@ -37,9 +37,6 @@ namespace mywork_chuan
         Bitmap cache = null;
 
 
-        byte[] _data;
-        int _currentIndex;
-
 
         public Form1()
         {
@@ -64,8 +61,6 @@ namespace mywork_chuan
             comboBox2.Items.Add("115200");
             label4.Text = num.ToString();
             cache = new Bitmap(320, 240, PixelFormat.Format24bppRgb);
-            this._data = new byte[2 * 320 * 240];
-            this._currentIndex = 0;
             this.timerDrawImage.Enabled = false;
         }
 
@@ -141,27 +136,33 @@ namespace mywork_chuan
             sp.Parity = Parity.None;//无校验位
             sp.ReadTimeout = -1;//设置超时读取时间
             sp.RtsEnable = true;
-            sp.DataReceived += new SerialDataReceivedEventHandler(sp_DataReceived);//接收到数据触发sp_DataReceived方法
+            sp.DataReceived += new SerialDataReceivedEventHandler(sp_dataReceived);//接收到数据触发spGlobal.DATAReceived方法
         }
 
         /*
          串口接收处理 
          */
-        private void sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private void sp_dataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            this.Invoke((EventHandler)delegate
+            if (this != null)
             {
-                this._data[_currentIndex] = (byte)sp.ReadByte();
-                //this.richTextBox1.Text += this._data[_currentIndex]+ " ";
-                this._currentIndex = (_currentIndex + 1) % _data.Length;
-            });
+                this.Invoke((EventHandler)delegate
+                {
+                    while (Global.CurrentIndex >= Global.DATA.Length)
+                        Global.CurrentIndex -= Global.DATA.Length;
+                    Global.DATA[Global.CurrentIndex] = (byte)sp.ReadByte();
+                    //this.richTextBox1.Text += Global.DATA[Global.CurrentIndex]+ " ";
+                    Global.CurrentIndex++;
+
+                });
+            }
         }
 
 
 
         private void button1_Click(object sender, EventArgs e)//清除接收按钮
         {
-            this._currentIndex = 0;
+            Global.CurrentIndex = 0;
             richTextBox1.Text = "";
             num = 0;
             label4.Text = num.ToString();
@@ -178,7 +179,7 @@ namespace mywork_chuan
 
         private void button3_Click(object sender, EventArgs e)//清除画图按钮，清除FORM画图，同时重新画线，last和j置初始值
         {
-            this._currentIndex = 0;
+            Global.CurrentIndex = 0;
             _graphics = this.CreateGraphics();
             _graphics.Clear(Color.White);
             Pen pn = new Pen(Color.Red);
@@ -212,20 +213,26 @@ namespace mywork_chuan
             {
                 using (_graphics = this.CreateGraphics())
                 {
-                    this.richTextBox1.Text = "";
+                    if (Global.CurrentIndex > 0)
+                        this.richTextBox1.Text = string.Format("{0} is {1}", Global.CurrentIndex, Global.DATA[Global.CurrentIndex - 1]);
+
+                    //for (int i = 10; i > 0; i--)
+                    //{
+                    //    this.richTextBox1.Text += Global.DATA[i].ToString()+ " ";
+                    //}
                     PointBitmap pb = new PointBitmap(cache);
 
                     pb.LockBits();
-                    for (int i = 0; i < this._data.Length; i += 2)
+                    for (int i = 0; i < Global.DATA.Length; i += 2)
                     {
                         int x = (i % 640) / 2;
                         int y = i / 640;
-                        int red = (this._data[i] & 0xF8) >> 3;
-                        int green = ((this._data[i] & 0x07) << 3) | ((this._data[i+1] & 0xE0) >> 5);
-                        int blue = this._data[i+1] & 0x1F;
-                        Color c = Color.FromArgb(red,green,blue);
+                        int red = (Global.DATA[i] & 0xF8) >> 3;
+                        int green = ((Global.DATA[i] & 0x07) << 3) | ((Global.DATA[i + 1] & 0xE0) >> 5);
+                        int blue = Global.DATA[i + 1] & 0x1F;
+                        Color c = Color.FromArgb(255, 0, 0);
                         pb.SetPixel(x, y, c);
-                        this.richTextBox1.Text += this._data[i] + "-" + this._data[i + 1] + "";
+                        //this.richTextBox1.Text += Global.DATA[i] + "-" + Global.DATA[i + 1] + "";
                     }
                     pb.UnlockBits();
                     _graphics.DrawImage(cache, 10, 200);
