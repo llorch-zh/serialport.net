@@ -82,7 +82,7 @@ namespace mywork_chuan
                     comboBox1.Enabled = false;
                     comboBox2.Enabled = false;
                     isSetProperty = true;
-                    s = new StreamWriter("C:\\Users\\Administrator\\Desktop\\拷贝\\程序\\c#\\自编串口助手\\mywork_chuan\\数据.txt");
+                    s = new StreamWriter("数据.txt");
                 }
                 catch
                 {
@@ -203,7 +203,7 @@ namespace mywork_chuan
         private void button5_Click(object sender, EventArgs e)//数据存储，存储至文件夹下“数据.txt”文件中
         {
             s.Close();
-            s = new StreamWriter("C:\\Users\\Administrator\\Desktop\\拷贝\\程序\\c#\\自编串口助手\\mywork_chuan\\数据" + count_txt.ToString() + ".txt");
+            s = new StreamWriter("数据" + count_txt.ToString() + ".txt");
             count_txt++;
             _graphics = this.CreateGraphics();
             _graphics.Clear(Color.White);
