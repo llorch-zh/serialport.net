@@ -2,3 +2,6 @@
 *.mdb
 *exe*
 *.pdb
+*.suo
+*.cache
+*.Cache

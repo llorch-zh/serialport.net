@@ -36,6 +36,11 @@ namespace mywork_chuan
         int count_txt = 1;//计第i个文件
         Bitmap cache = null;
 
+
+        Color[] _data;
+        int _currentIndex;
+
+
         public Form1()
         {
             InitializeComponent();
@@ -59,7 +64,8 @@ namespace mywork_chuan
             comboBox2.Items.Add("115200");
             label4.Text = num.ToString();
             cache = new Bitmap(320, 240, PixelFormat.Format24bppRgb);
-           
+           this._data=new Color[320*240];
+           this._currentIndex = 0;
         }
 
         /*
@@ -82,6 +88,7 @@ namespace mywork_chuan
                     comboBox1.Enabled = false;
                     comboBox2.Enabled = false;
                     isSetProperty = true;
+                    this.richTextBox1.Text = "";
                     s = new StreamWriter("数据.txt");
                 }
                 catch
@@ -139,8 +146,50 @@ namespace mywork_chuan
          */
         private void sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            System.Threading.Thread.Sleep(10);//延时10ms等待接收完数据,根据实际情况定
+            //System.Threading.Thread.Sleep(1000);//延时10ms等待接收完数据,根据实际情况定
                                               //代理，对数据进行处理
+
+
+
+            int SDateTemp = this.sp.ReadByte();
+            //读取串口中一个字节的数据  
+            this.richTextBox1.Invoke(
+                //在拥有此控件的基础窗口句柄的线程上执行委托Invoke(Delegate)  
+                //即在textBox_ReceiveDate控件的父窗口form中执行委托.  
+             new MethodInvoker(
+                /*表示一个委托，该委托可执行托管代码中声明为 void 且不接受任何参数的任何方法。 在对控件的 Invoke    方法进行调用时或需要一个简单委托又不想自己定义时可以使用该委托。*/
+             delegate
+             {
+                 /*匿名方法,<a href="http://lib.csdn.net/base/25" class='replace_word' title="C#知识库" target='_blank' style='color:#df3434; font-weight:bold;'>C#</a>2.0的新功能，这是一种允许程序员将一段完整代码区块当成参数传递的程序代码编写技术，通过此种方法可    以直接使用委托来设计事件响应程序以下就是你要在主线程上实现的功能但是有一点要注意，这里不适宜处理过多的方法，因为C#消息机制是消息流水线响应机制，如果这里在主线程上处理语句的时间过长会导致主UI线程阻塞，停止响应或响应不顺畅,这时你的主form界面会延迟或卡死      */
+                 this.richTextBox1.AppendText(SDateTemp.ToString());//输出到主窗口文本控件  
+                 this.richTextBox1.Text += " ";
+
+                 // position
+                 int x = this._currentIndex % 320;
+                 int y = this._currentIndex / 320;
+
+                 // data to color
+                 Color c = Color.FromArgb(SDateTemp,255,0);
+
+                 //loop flag
+                 this._currentIndex = (this._currentIndex + 1) % (320 * 240);
+
+
+                 _graphics = this.CreateGraphics();
+                 PointBitmap pb = new PointBitmap(cache);
+                 pb.LockBits();
+                 pb.SetPixel(x,y,c);
+                 pb.UnlockBits();
+                 _graphics.DrawImage(cache,10,200);
+
+
+             }
+             )
+             );
+
+
+            return;
+
 
             this.Invoke((EventHandler)(delegate
             {
@@ -152,10 +201,19 @@ namespace mywork_chuan
                 {
                     for (int h = 0; h < 240; h++)
                     {
-                        int r = Convert.ToInt32(255);//逐字节读取
-                        int g = Convert.ToInt32(0);//换算Y值，当前画图区在200-380之间，共180像素
-                        int b = Convert.ToInt32(0);//逐字节读取
-                        Color c = Color.FromArgb(r, g, b);
+                        Color c = Color.White; ;
+                        if (tmp > h * 320 + w) 
+                        {
+                            c = Color.Black;
+                            
+                        }
+                        else
+                        {
+                            int r = Convert.ToInt32(255);//逐字节读取
+                            int g = Convert.ToInt32(0);//换算Y值，当前画图区在200-380之间，共180像素
+                            int b = Convert.ToInt32(0);//逐字节读取
+                            c = Color.FromArgb(r, g, b);
+                        }
                         pb.SetPixel(w, h, c);
                     }
                 }
@@ -163,6 +221,8 @@ namespace mywork_chuan
                 _graphics.DrawImage(cache, 10, 200);
 
 
+
+                
                 //s.Close();
             }));
 
@@ -173,6 +233,7 @@ namespace mywork_chuan
 
         private void button1_Click(object sender, EventArgs e)//清除接收按钮
         {
+            this._currentIndex = 0;
             richTextBox1.Text = "";
             num = 0;
             label4.Text = num.ToString();
@@ -189,9 +250,10 @@ namespace mywork_chuan
 
         private void button3_Click(object sender, EventArgs e)//清除画图按钮，清除FORM画图，同时重新画线，last和j置初始值
         {
+            this._currentIndex = 0;
             _graphics = this.CreateGraphics();
             _graphics.Clear(Color.White);
-            Pen pn = new Pen(Color.Black);
+            Pen pn = new Pen(Color.Red);
             Point pt1 = new Point(0, 300);
             Point pt2 = new Point(480, 300);
             _graphics.DrawLine(pn, pt1, pt2);
