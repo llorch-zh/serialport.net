@@ -1,0 +1,12 @@
+﻿<Properties StartupItem="mywork_chuan\mywork_chuan.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="mywork_chuan\Form1.cs">
+    <Files>
+      <File FileName="mywork_chuan\Form1.cs" Line="147" Column="15" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
