@@ -5,3 +5,5 @@
 *.suo
 *.cache
 *.Cache
+*/bin/*
+*/obj/*
