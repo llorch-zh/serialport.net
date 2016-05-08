@@ -20,6 +20,9 @@ namespace mywork_chuan
         /// </summary>
         SerialPort serialPort = null;
         bool isOn = false;//打开串口标志位
+        ByteArrayRenderDelegate byteArrayRenderDelegate;
+
+
 
         public MainForm()
         {
@@ -47,6 +50,8 @@ namespace mywork_chuan
 #if DEBUG
             this.comboBoxPort.SelectedItem = "COM1";
             this.comboBoxBaud.SelectedItem = "115200";
+            RawRender rawRender = new RawRender();
+            this.byteArrayRenderDelegate = rawRender.SimpleRGB;
 #endif
         }
 
@@ -124,29 +129,14 @@ namespace mywork_chuan
         {
             this.Invoke((EventHandler)(delegate
             {
-
                 if (Shared.CurrentIndex > 0)
                     this.richTextBoxOutput.Text = string.Format("{0} is {1}", Shared.CurrentIndex, Shared.DATA[Shared.CurrentIndex - 1]);
-
+                // Re-render bytes to image
                 Bitmap bmp = new Bitmap(this.pictureBoxRender.Image);
-                PointBitmap pb = new PointBitmap(bmp);
-
-                pb.LockBits();
-                for (int i = 0; i < Shared.DATA.Length; i += 2)
+                if(this.byteArrayRenderDelegate!=null)
                 {
-                    int x = (i % 640) / 2;
-                    int y = i / 640;
-
-                    int red = Shared.DATA[i] * 4 > 255 ? Shared.DATA[i] : 255;
-                    int green = Shared.DATA[i + 1] * 4 > 255 ? Shared.DATA[i + 1] : 255;
-                    int blue = red / 3 + green * 2 / 3;
-                    //int red = (Global.DATA[i] & 0xF8) >> 3;
-                    //int green = ((Global.DATA[i] & 0x07) << 3) | ((Global.DATA[i + 1] & 0xE0) >> 5);
-                    //int blue = Global.DATA[i + 1] & 0x1F;
-                    Color c = Color.FromArgb(red, green, blue);
-                    pb.SetPixel(x, y, c);
+                    this.byteArrayRenderDelegate(bmp,Shared.DATA);
                 }
-                pb.UnlockBits();
                 this.pictureBoxRender.Image = bmp;
             }));
         }
