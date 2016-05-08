@@ -15,10 +15,10 @@ F:\workspace\mywork_chuan\mywork_chuan\obj\Debug\mywork_chuan.Properties.Resourc
 F:\workspace\mywork_chuan\mywork_chuan\obj\Debug\mywork_chuan.csproj.GenerateResource.Cache
 F:\workspace\mywork_chuan\mywork_chuan\obj\Debug\mywork_chuan.exe
 F:\workspace\mywork_chuan\mywork_chuan\obj\Debug\mywork_chuan.pdb
-E:\mywork_chuan\mywork_chuan\obj\Debug\mywork_chuan.Form1.resources
-E:\mywork_chuan\mywork_chuan\obj\Debug\mywork_chuan.Properties.Resources.resources
-E:\mywork_chuan\mywork_chuan\obj\Debug\mywork_chuan.csproj.GenerateResource.Cache
 E:\mywork_chuan\mywork_chuan\bin\Debug\mywork_chuan.exe
 E:\mywork_chuan\mywork_chuan\bin\Debug\mywork_chuan.pdb
+E:\mywork_chuan\mywork_chuan\obj\Debug\mywork_chuan.MainForm.resources
+E:\mywork_chuan\mywork_chuan\obj\Debug\mywork_chuan.Properties.Resources.resources
+E:\mywork_chuan\mywork_chuan\obj\Debug\mywork_chuan.csproj.GenerateResource.Cache
 E:\mywork_chuan\mywork_chuan\obj\Debug\mywork_chuan.exe
 E:\mywork_chuan\mywork_chuan\obj\Debug\mywork_chuan.pdb
