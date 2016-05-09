@@ -7,7 +7,9 @@ namespace mywork_chuan
 {
     class Shared
     {
-        public static byte[] RawData=new byte[2*320*240];
-        public static int CurrentIndex = 0;
+        public static byte[] RawData;
+        public static int CurrentIndex ;
+        public static int PixelWidth;
+
     }
 }

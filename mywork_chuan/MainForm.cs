@@ -139,7 +139,7 @@ namespace mywork_chuan
                 genericBitmap.Height = this.pictureBoxRender.Height;
 
                 BitmapColorReader reader = new BitmapColorReader();
-                genericBitmap.ReadFromByteArray(reader.TestHandler, Shared.RawData);
+                genericBitmap.ReadFromByteArray(reader.RGB888ReadHandler, Shared.RawData);
 
                 this.pictureBoxRender.Image = genericBitmap.ToBitmap();
             }));
@@ -155,6 +155,9 @@ namespace mywork_chuan
             SetPortProperty();
             this.serialPort.Open();
             isOn = true;
+            Shared.PixelWidth = 3;
+            Shared.RawData=new byte[Shared.PixelWidth*320*240];
+            Shared.CurrentIndex = 0;
         }
 
         private void SwitchOff()

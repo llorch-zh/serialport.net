@@ -87,8 +87,8 @@ namespace mywork_chuan
             if (this._colorData == null || this._width == 0 || this._height == 0)
                 throw new ArgumentNullException();
 
-            if (this._colorData.Length != this._width * this._height)
-                throw new ArgumentOutOfRangeException();
+            //if (this._colorData.Length != this._width * this._height)
+            //    throw new ArgumentOutOfRangeException();
 
 
             // Convert to System.Drawing.Bitmap
