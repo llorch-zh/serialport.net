@@ -47,7 +47,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ByteArrayRenderDelegate.cs" />
+    <Compile Include="BitmapColorReader.cs" />
+    <Compile Include="GenericBitmap.cs" />
+    <Compile Include="BitmapColorWriter.cs" />
+    <Compile Include="ByteArrayToColorArrayDelegate.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

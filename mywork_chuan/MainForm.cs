@@ -87,17 +87,17 @@ namespace mywork_chuan
             {
                 // cycled array
                 int count = serialPort.BytesToRead;
-                if (count + Shared.CurrentIndex >= Shared.DATA.Length)
+                if (count + Shared.CurrentIndex >= Shared.RawData.Length)
                 {
-                    serialPort.Read(Shared.DATA, Shared.CurrentIndex, Shared.DATA.Length - Shared.CurrentIndex - 1);
-                    serialPort.Read(Shared.DATA, 0, count + Shared.CurrentIndex - Shared.DATA.Length + 1);
+                    serialPort.Read(Shared.RawData, Shared.CurrentIndex, Shared.RawData.Length - Shared.CurrentIndex - 1);
+                    serialPort.Read(Shared.RawData, 0, count + Shared.CurrentIndex - Shared.RawData.Length + 1);
                 }
                 else
                 {
-                    serialPort.Read(Shared.DATA, Shared.CurrentIndex, serialPort.BytesToRead);
+                    serialPort.Read(Shared.RawData, Shared.CurrentIndex, serialPort.BytesToRead);
 
                 }
-                Shared.CurrentIndex = (Shared.CurrentIndex + count) % Shared.DATA.Length;
+                Shared.CurrentIndex = (Shared.CurrentIndex + count) % Shared.RawData.Length;
             };
         }
 
@@ -119,9 +119,11 @@ namespace mywork_chuan
 
         private void buttonSave_Click(object sender, EventArgs e)//数据存储，存储至文件夹下“数据.txt”文件中
         {
-            using (StreamWriter s = new StreamWriter("数据" + DateTime.Now.ToLongDateString() + ".txt"))
+            using (FileStream s = new FileStream("数据" + DateTime.Now.ToLongDateString() + ".txt",FileMode.CreateNew))
             {
                 // todo: write image data to file
+                Image img = this.pictureBoxRender.Image;
+                img.Save(s,img.RawFormat);
             }
         }
 
@@ -130,14 +132,21 @@ namespace mywork_chuan
             this.Invoke((EventHandler)(delegate
             {
                 if (Shared.CurrentIndex > 0)
-                    this.richTextBoxOutput.Text = string.Format("{0} is {1}", Shared.CurrentIndex, Shared.DATA[Shared.CurrentIndex - 1]);
+                    this.richTextBoxOutput.Text = string.Format("{0} is {1}", Shared.CurrentIndex, Shared.RawData[Shared.CurrentIndex - 1]);
                 // Re-render bytes to image
-                Bitmap bmp = new Bitmap(this.pictureBoxRender.Image);
-                if(this.byteArrayRenderDelegate!=null)
-                {
-                    this.byteArrayRenderDelegate(bmp,Shared.DATA);
-                }
-                this.pictureBoxRender.Image = bmp;
+                //Bitmap bmp = new Bitmap(this.pictureBoxRender.Image);
+                //if(this.byteArrayRenderDelegate!=null)
+                //{
+                //    this.byteArrayRenderDelegate(bmp,Shared.RawData);
+                //}
+                //this.pictureBoxRender.Image = bmp;
+
+                GenericBitmap genericBitmap = new GenericBitmap();
+                genericBitmap.Width = this.pictureBoxRender.Width;
+                genericBitmap.Height = this.pictureBoxRender.Height;
+                BitmapColorReader reader = new BitmapColorReader();
+                genericBitmap.ReadFromByteArray(reader.TestHandler,Shared.RawData);
+                this.pictureBoxRender.Image = genericBitmap.ToBitmap();
             }));
         }
 
@@ -165,7 +174,7 @@ namespace mywork_chuan
 
         private void Reset()
         {
-            Shared.DATA = new byte[Shared.DATA.Length];
+            Shared.RawData = new byte[Shared.RawData.Length];
             Shared.CurrentIndex = 0;
         }
 

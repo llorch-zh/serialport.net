@@ -7,7 +7,7 @@ namespace mywork_chuan
 {
     class Shared
     {
-        public static byte[] DATA=new byte[2*320*240];
+        public static byte[] RawData=new byte[2*320*240];
         public static int CurrentIndex = 0;
     }
 }
