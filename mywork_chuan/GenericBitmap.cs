@@ -65,7 +65,7 @@ namespace mywork_chuan
         public void WriteToByteArray(ColorArrayToByteArrayDelegate writerHandler, byte[] rawdata)
         {
             // todo: imp
-            if(writerHandler==null || rawdata==null)
+            if (writerHandler == null || rawdata == null)
                 throw new ArgumentNullException();
 
             if (this._colorData == null)
@@ -92,7 +92,7 @@ namespace mywork_chuan
 
 
             // Convert to System.Drawing.Bitmap
-            Bitmap ret = new Bitmap(this._width, this._height);
+            Bitmap ret = new Bitmap(this._width,this._height);
             PointBitmap pBMP = new PointBitmap(ret);
             pBMP.LockBits();
             for (int y = 0; y < this._height; y++)
@@ -105,6 +105,7 @@ namespace mywork_chuan
             }
             pBMP.UnlockBits();
             return ret;
+
         }
     }// end class BitmapColors
 }//

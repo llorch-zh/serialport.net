@@ -20,7 +20,6 @@ namespace mywork_chuan
         /// </summary>
         SerialPort serialPort = null;
         bool isOn = false;//打开串口标志位
-        ByteArrayRenderDelegate byteArrayRenderDelegate;
 
 
 
@@ -44,14 +43,14 @@ namespace mywork_chuan
             comboBoxBaud.Items.Add("115200");
             this.timerDrawImage.Enabled = false;
 
-            this.pictureBoxRender.Image = new Bitmap(320,240);
+            this.pictureBoxRender.Image = new Bitmap(320, 240);
 
             // default
 #if DEBUG
             this.comboBoxPort.SelectedItem = "COM1";
             this.comboBoxBaud.SelectedItem = "115200";
-            RawRender rawRender = new RawRender();
-            this.byteArrayRenderDelegate = rawRender.SimpleRGB;
+            //RawRender rawRender = new RawRender();
+            //this.byteArrayRenderDelegate = rawRender.SimpleRGB;
 #endif
         }
 
@@ -104,6 +103,7 @@ namespace mywork_chuan
         private void buttonClear_Click(object sender, EventArgs e)//清除接收按钮
         {
             Shared.CurrentIndex = 0;
+            Shared.RawData = new byte[Shared.RawData.Length];
             richTextBoxOutput.Text = "";
         }
 
@@ -119,11 +119,11 @@ namespace mywork_chuan
 
         private void buttonSave_Click(object sender, EventArgs e)//数据存储，存储至文件夹下“数据.txt”文件中
         {
-            using (FileStream s = new FileStream("数据" + DateTime.Now.ToLongDateString() + ".txt",FileMode.CreateNew))
+            using (FileStream s = new FileStream("数据" + DateTime.Now.ToLongDateString() + ".txt", FileMode.CreateNew))
             {
                 // todo: write image data to file
                 Image img = this.pictureBoxRender.Image;
-                img.Save(s,img.RawFormat);
+                img.Save(s, img.RawFormat);
             }
         }
 
@@ -133,19 +133,14 @@ namespace mywork_chuan
             {
                 if (Shared.CurrentIndex > 0)
                     this.richTextBoxOutput.Text = string.Format("{0} is {1}", Shared.CurrentIndex, Shared.RawData[Shared.CurrentIndex - 1]);
-                // Re-render bytes to image
-                //Bitmap bmp = new Bitmap(this.pictureBoxRender.Image);
-                //if(this.byteArrayRenderDelegate!=null)
-                //{
-                //    this.byteArrayRenderDelegate(bmp,Shared.RawData);
-                //}
-                //this.pictureBoxRender.Image = bmp;
 
                 GenericBitmap genericBitmap = new GenericBitmap();
                 genericBitmap.Width = this.pictureBoxRender.Width;
                 genericBitmap.Height = this.pictureBoxRender.Height;
+
                 BitmapColorReader reader = new BitmapColorReader();
-                genericBitmap.ReadFromByteArray(reader.TestHandler,Shared.RawData);
+                genericBitmap.ReadFromByteArray(reader.TestHandler, Shared.RawData);
+
                 this.pictureBoxRender.Image = genericBitmap.ToBitmap();
             }));
         }

@@ -24,11 +24,12 @@ namespace mywork_chuan
         public Color[] TestHandler(byte[] rawdata)
         {
             Color[] ret = new Color[rawdata.Length/2];
-            for (int i = 0; i < ret.Length; i+=2)
+            for (int i = 0; i < ret.Length; i++)
             {
-                int r = rawdata[i];
-                int g = rawdata[i] * 1 / 3+rawdata[i]*2/3;
-                int b = rawdata[i+1];
+                int r = rawdata[2*i];
+                int g = rawdata[2*i] * 1 / 3+rawdata[2*i+1]*2/3;
+                int b = rawdata[2*i+1];
+                ret[i] = Color.FromArgb(r,g,b);
             }
             return ret;
         }
